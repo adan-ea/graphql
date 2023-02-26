@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Classes table
+model Class {
+  class_id    Int       @id @default(autoincrement())
+  class_name  String
+  class_level Int
+  school_year String
+  students    Student[]
+  courses     Course[]
+}
+
+// Students table
+model Student {
+  student_id    Int      @id @default(autoincrement())
+  first_name    String
+  last_name     String
+  date_of_birth String
+  gender        String
+  address       String
+  class         Class    @relation(fields: [class_id], references: [class_id])
+  class_id      Int
+  grades        Grade[]
+  created_at    String
+}
+
+// Grades table
+model Grade {
+  grade_id   Int      @id @default(autoincrement())
+  value      Float
+  date       String
+  student    Student  @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+  student_id Int
+  course     Course   @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+  course_id  Int
+}
+
+// Teachers table
+model Teacher {
+  teacher_id    Int      @id @default(autoincrement())
+  first_name    String
+  last_name     String
+  email_address String
+  password      String
+  courses       Course[]
+  created_at    String
+}
+
+// Programs table
+model Program {
+  program_id          Int       @id @default(autoincrement())
+  program_name        String
+  program_description String
+  subjects            Subject[]
+}
+
+// Subjects table
+model Subject {
+  subject_id          Int      @id @default(autoincrement())
+  subject_name        String
+  subject_description String
+  program             Program  @relation(fields: [program_id], references: [program_id], onDelete: Cascade)
+  program_id          Int
+  courses             Course[]
+}
+
+// Courses table
+model Course {
+  course_id  Int      @id @default(autoincrement())
+  date       String
+  start_time String
+  end_time   String
+  teacher    Teacher  @relation(fields: [teacher_id], references: [teacher_id], onDelete: Cascade)
+  teacher_id Int
+  subject    Subject  @relation(fields: [subject_id], references: [subject_id], onDelete: Cascade)
+  subject_id Int
+  class      Class    @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
+  class_id   Int
+  Grade      Grade[]
+}
